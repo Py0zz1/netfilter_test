@@ -27,7 +27,6 @@ static int callback(struct nfq_q_handle *qhandle, struct nfgenmsg *nfmsg,
     u_int32_t id=0;
     unsigned char *pkt;
     struct nfqnl_msg_packet_hdr *ph;
-//    struct ip_header *ih;
     struct ip_header * ih;
     struct tcp_header *th;
 
