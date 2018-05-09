@@ -27,7 +27,6 @@ static int callback(struct nfq_q_handle *qhandle, struct nfgenmsg *nfmsg,
     u_int32_t id=0;
     unsigned char *pkt;
     struct nfqnl_msg_packet_hdr *ph;
-//    struct ip_header *ih;
     struct ip_header * ih;
     struct tcp_header *th;
 
@@ -37,7 +36,7 @@ static int callback(struct nfq_q_handle *qhandle, struct nfgenmsg *nfmsg,
     nfq_get_payload(nf_data,&pkt);
 
     ih = (ip_header *)pkt;
-    th = (tcp_header *)(pkt+sizeof(ip_header));
+    th = (tcp_header *)(pkt+ih->ip_header_length*4);
 
     if( ih->ip_version == 4 && (ntohs(th->des_port) == 80 || ntohs(th->src_port) == 80))
     {
