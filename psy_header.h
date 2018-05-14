@@ -66,27 +66,69 @@ struct ip_header
     struct in_addr ip_des_add;
     //20bytes
 };
+#pragma pack(pop)
 
-
+#pragma pack(push, 2)
 struct tcp_header
 {
-    uint16_t src_port;
-    uint16_t des_port;
-    uint32_t sqn_num;
-    uint32_t ack_num;
-    uint8_t offset : 4;
-    uint8_t ns : 1;
-    uint8_t reserve : 3;
-    uint8_t flag_cwr : 1;
-    uint8_t flag_ece : 1;
-    uint8_t flag_urgent : 1;
-    uint8_t flag_ack : 1;
-    uint8_t flag_push : 1;
-    uint8_t flag_reset : 1;
-    uint8_t flag_syn : 1;
-    uint8_t flag_fin : 1;
-    uint16_t window;
-    uint16_t chk_sum;
-    uint16_t urgent_point;
-    //20bytes
+uint16_t th_sport;       /* source port */
+uint16_t th_dport;       /* destination port */
+uint32_t th_seq;          /* sequence number */
+uint32_t th_ack;          /* acknowledgement number */
+
+uint8_t th_nop:4;
+uint8_t  th_off:4;/* data offset */
+                  /* (unused) */
+uint8_t  th_flags;       /* control flags */
+#ifndef TH_FIN
+#define TH_FIN    0x01      /* finished send data */
+#endif
+#ifndef TH_SYN
+#define TH_SYN    0x02      /* synchronize sequence numbers */
+#endif
+#ifndef TH_RST
+#define TH_RST    0x04      /* reset the connection */
+#endif
+#ifndef TH_PUSH
+#define TH_PUSH   0x08      /* push data to the app layer */
+#endif
+#ifndef TH_ACK
+#define TH_ACK    0x10      /* acknowledge */
+#endif
+#ifndef TH_URG
+#define TH_URG    0x20      /* urgent! */
+#endif
+#ifndef TH_ECE
+#define TH_ECE    0x40
+#endif
+#ifndef TH_CWR
+#define TH_CWR    0x80
+#endif
+uint16_t th_win;         /* window */
+uint16_t th_sum;         /* checksum */
+uint16_t th_urp;         /* urgent pointer */
 };
+#pragma pack(pop)
+//struct tcp_header
+//{
+//    uint16_t src_port;
+//    uint16_t des_port;
+//    uint32_t sqn_num;
+//    uint32_t ack_num;
+
+//    uint8_t ns : 1;
+//    uint8_t reserve : 3;
+//    uint8_t offset : 4;
+//    uint8_t flag_cwr : 1;
+//    uint8_t flag_ece : 1;
+//    uint8_t flag_urgent : 1;
+//    uint8_t flag_ack : 1;
+//    uint8_t flag_push : 1;
+//    uint8_t flag_reset : 1;
+//    uint8_t flag_syn : 1;
+//    uint8_t flag_fin : 1;
+//    uint16_t window;
+//    uint16_t chk_sum;
+//    uint16_t urgent_point;
+//    //20bytes
+//};
