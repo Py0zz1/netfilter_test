@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <netinet/in.h>
 #include <linux/types.h>
 #include <linux/netfilter.h>
 #include <errno.h>
 #include "psy_header.h"
+
 
 #include <libnetfilter_queue/libnetfilter_queue.h>
 
@@ -16,7 +18,7 @@ void dump(unsigned char *pkt, int len)
     printf("\n");
     for(int i=0; i<len; i++)
     {
-        printf("%02X ",pkt[i]);
+        printf("%02c",pkt[i]);
     }
     printf("\n");
 }
@@ -26,6 +28,8 @@ static int callback(struct nfq_q_handle *qhandle, struct nfgenmsg *nfmsg,
 {
     u_int32_t id=0;
     unsigned char *pkt;
+    unsigned char *data_pkt;
+    char *host = "test.gilgil.net";
     struct nfqnl_msg_packet_hdr *ph;
     struct ip_header * ih;
     struct tcp_header *th;
@@ -38,13 +42,24 @@ static int callback(struct nfq_q_handle *qhandle, struct nfgenmsg *nfmsg,
     ih = (ip_header *)pkt;
     th = (tcp_header *)(pkt+ih->ip_header_length*4);
 
-    if( ih->ip_version == 4 && (ntohs(th->des_port) == 80 || ntohs(th->src_port) == 80))
-    {
-        printf("==================Port 80 Blocking================\n");
-        printf("IPv%d - DstPort : %d\n",ih->ip_version,ntohs(th->des_port));
-        return nfq_set_verdict(qhandle,id,NF_DROP,0,NULL);
-    }
 
+  data_pkt = pkt+((ih->ip_header_length*4)+(th->th_off*4));
+
+    if( ih->ip_version == 4 && (ntohs(th->th_dport) == 80 || ntohs(th->th_sport) == 80))
+    {
+
+        if(data_pkt[0] != 0) // HTTP DATA
+        {
+            data_pkt+=22;  
+            if(!(memcmp(data_pkt,host,sizeof(host))))
+            {
+                printf("================== test.gilgil.net Blocking ================\n");
+                printf("IPv%d - DstPort : %d\n",ih->ip_version,ntohs(th->th_dport));
+                dump(data_pkt,strlen(host));
+                return nfq_set_verdict(qhandle,id,NF_DROP,0,NULL);
+            }
+        }
+    }
     return nfq_set_verdict(qhandle,id,NF_ACCEPT,0,NULL);
 }
 
